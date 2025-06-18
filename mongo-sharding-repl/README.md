@@ -12,34 +12,34 @@ docker compose up -d
 Делаем инициализацию mongodb 
 
 ```shell
-./scripts/mongo-init.sh
-```
-
-После выполнения скрипта вы должны увидеть 
-
-```shell
-MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27018
-MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27019
-MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27020
-
+bash ./scripts/mongo-init.sh
 ```
 
 Заполняем mongodb данными
 
 ```shell
-./scripts/mongo-fill-data.sh
+bash ./scripts/mongo-fill-data.sh
 ```
 
 После выполнения скрипта вы должны увидеть
 
 ```shell
-1. Добавляем шарды и настраиваем шардинг...
+1. Инициализируем конфигурационный сервер (replica set)...
+MongoServerError: already initialized
+2. Инициализируем шард1 (replica set)...
+MongoServerError: already initialized
+3. Инициализируем шард2 (replica set)...
+MongoServerError: already initialized
+4. Ждем стабилизации репликационных наборов...
+5. Добавляем шарды в кластер через mongos...
 Всего документов в кластере: 1000
-2. Проверяем количество документов на шарде 1...
-Документов на shard1: 492
-3. Проверяем количество документов на шарде 2...
-Документов на shard2: 508
-Инициализация завершена!
+6. Проверяем количество документов на репликах шарда 1...
+Документов на shard1 primary: 492
+Документов на shard1 secondary: 492
+7. Проверяем количество документов на репликах шарда 2...
+Документов на shard2 primary: 508
+Документов на shard2 secondary: 508
+
 ```
 
 ## Как проверить
@@ -49,7 +49,7 @@ MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27020
 Откройте в браузере http://localhost:8080
 
 Должны увидеть
-![img.png](img.png)
+![img_1.png](img_1.png)
 
 ### Если вы запускаете проект на предоставленной виртуальной машине
 

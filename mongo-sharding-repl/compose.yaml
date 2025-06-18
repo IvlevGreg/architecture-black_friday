@@ -1,8 +1,8 @@
 services:
-  #сервер конфигурации
-  configSrv:
-    image: mongo:latest # docker образ
-    container_name: configSrv
+  # Config server replica set (3 nodes)
+  configSrv1:
+    image: mongo:latest
+    container_name: configSrv1
     restart: always
     ports:
       - "27017:27017"
@@ -10,10 +10,10 @@ services:
       app-network:
         ipv4_address: 173.17.0.10
     volumes:
-      - config-data:/data/db
+      - config1-data:/data/db
     command:
       [
-        "--configsvr",  #запуск в режиме конфигурации
+        "--configsvr",
         "--replSet",
         "config_server",
         "--bind_ip_all",
@@ -26,23 +26,75 @@ services:
       start_period: 10s
       retries: 5
 
-  #1-й шард
-  shard1:
+  configSrv2:
     image: mongo:latest
-    container_name: shard1
+    container_name: configSrv2
+    restart: always
+    ports:
+      - "27021:27021"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.11
+    volumes:
+      - config2-data:/data/db
+    command:
+      [
+        "--configsvr",
+        "--replSet",
+        "config_server",
+        "--bind_ip_all",
+        "--port",
+        "27021"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      start_period: 10s
+      retries: 5
+
+  configSrv3:
+    image: mongo:latest
+    container_name: configSrv3
+    restart: always
+    ports:
+      - "27022:27022"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.12
+    volumes:
+      - config3-data:/data/db
+    command:
+      [
+        "--configsvr",
+        "--replSet",
+        "config_server",
+        "--bind_ip_all",
+        "--port",
+        "27022"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      start_period: 10s
+      retries: 5
+
+  # Shard 1 replica set (3 nodes)
+  shard1a:
+    image: mongo:latest
+    container_name: shard1a
     restart: always
     ports:
       - "27018:27018"
     networks:
       app-network:
-        ipv4_address: 173.17.0.9
+        ipv4_address: 173.17.0.20
     volumes:
-      - shard1-data:/data/db
+      - shard1a-data:/data/db
     command:
       [
-        "--shardsvr", #запуск в режиме шардинга
+        "--shardsvr",
         "--replSet",
-        "shard1", #название реплики
+        "shard1",
         "--bind_ip_all",
         "--port",
         "27018"
@@ -53,24 +105,76 @@ services:
       start_period: 10s
       retries: 5
 
-  #2-й шард
-  shard2:
+  shard1b:
     image: mongo:latest
-    container_name: shard2
+    container_name: shard1b
+    restart: always
+    ports:
+      - "27023:27023"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.21
+    volumes:
+      - shard1b-data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard1",
+        "--bind_ip_all",
+        "--port",
+        "27023"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      start_period: 10s
+      retries: 5
+
+  shard1c:
+    image: mongo:latest
+    container_name: shard1c
+    restart: always
+    ports:
+      - "27024:27024"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.22
+    volumes:
+      - shard1c-data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard1",
+        "--bind_ip_all",
+        "--port",
+        "27024"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      start_period: 10s
+      retries: 5
+
+  # Shard 2 replica set (3 nodes)
+  shard2a:
+    image: mongo:latest
+    container_name: shard2a
     restart: always
     ports:
       - "27019:27019"
     networks:
       app-network:
-        ipv4_address: 173.17.0.8
+        ipv4_address: 173.17.0.30
     volumes:
-      - shard2-data:/data/db
+      - shard2a-data:/data/db
     command:
       [
-        "--shardsvr", #запуск в режиме шардинга
+        "--shardsvr",
         "--replSet",
-        "shard2", #название реплик
-        "--bind_ip_all", # обратите внимание - она отличается от реплики 1-го шарда
+        "shard2",
+        "--bind_ip_all",
         "--port",
         "27019"
       ]
@@ -80,7 +184,59 @@ services:
       start_period: 10s
       retries: 5
 
-  #роутер
+  shard2b:
+    image: mongo:latest
+    container_name: shard2b
+    restart: always
+    ports:
+      - "27025:27025"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.31
+    volumes:
+      - shard2b-data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard2",
+        "--bind_ip_all",
+        "--port",
+        "27025"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      start_period: 10s
+      retries: 5
+
+  shard2c:
+    image: mongo:latest
+    container_name: shard2c
+    restart: always
+    ports:
+      - "27026:27026"
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.32
+    volumes:
+      - shard2c-data:/data/db
+    command:
+      [
+        "--shardsvr",
+        "--replSet",
+        "shard2",
+        "--bind_ip_all",
+        "--port",
+        "27026"
+      ]
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      start_period: 10s
+      retries: 5
+
+  # Router (mongos)
   mongo-sharding:
     image: mongo:latest
     container_name: mongo-sharding
@@ -92,9 +248,9 @@ services:
         ipv4_address: 173.17.0.7
     command:
       [
-         "mongos", #обычная mongo в режиме роутера
+        "mongos",
         "--configdb",
-        "config_server/configSrv:27017", #передача данных сервера конфигурации
+        "config_server/configSrv1:27017,configSrv2:27021,configSrv3:27022",
         "--bind_ip_all",
         "--port",
         "27020"
@@ -128,7 +284,12 @@ networks:
         - subnet: 173.17.0.0/16
 
 volumes:
-  mongodb1_data_container:
-  config-data:
-  shard1-data:
-  shard2-data:
+  config1-data:
+  config2-data:
+  config3-data:
+  shard1a-data:
+  shard1b-data:
+  shard1c-data:
+  shard2a-data:
+  shard2b-data:
+  shard2c-data:
