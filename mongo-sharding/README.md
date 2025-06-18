@@ -12,7 +12,7 @@ docker compose up -d
 Делаем инициализацию mongodb 
 
 ```shell
-./scripts/mongo-init.sh
+bash ./scripts/mongo-init.sh
 ```
 
 После выполнения скрипта вы должны увидеть 
@@ -27,7 +27,7 @@ MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27020
 Заполняем mongodb данными
 
 ```shell
-./scripts/mongo-fill-data.sh
+bash ./scripts/mongo-fill-data.sh
 ```
 
 После выполнения скрипта вы должны увидеть
