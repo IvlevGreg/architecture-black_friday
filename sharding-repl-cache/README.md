@@ -42,6 +42,20 @@ MongoServerError: already initialized
 
 ```
 
+Инициализируем redis
+
+```shell
+bash ./scripts/redis-init.sh
+```
+После выполнения скрипта вы должны увидеть
+
+```shell
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+```
+
 ## Как проверить
 
 ### Если вы запускаете проект на локальной машине
@@ -49,7 +63,7 @@ MongoServerError: already initialized
 Откройте в браузере http://localhost:8080
 
 Должны увидеть
-![img_1.png](img_1.png)
+![img_2.png](img_2.png)
 
 ### Если вы запускаете проект на предоставленной виртуальной машине
 
